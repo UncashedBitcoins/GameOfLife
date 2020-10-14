@@ -1,24 +1,49 @@
+let canvas = document.getElementsByTagName("canvas")[0];
+let context = canvas.getContext("2d");
+let pixel_size = 10;
+let grid_size = 5;
+let canvas_size = grid_size * pixel_size;
+
+canvas.width = canvas_size;
+canvas.height = canvas_size;
+
 console.log("A Game of Life");
-myGrid = [
-  [ 0, 1, 1, 1, 0 ],
-  [ 0, 1, 1, 0, 0 ],
-  [ 0, 0, 1, 0, 1 ],
-  [ 0, 1, 0, 1, 0 ],
-  [ 1, 1, 0, 0, 0 ]
-]
+myGrid = random_grid(grid_size);
 
+setInterval(function() {
+  draw_game(myGrid);
+  myGrid=update_grid(myGrid);
+},1000);
 
-console.log(myGrid);
-  myGrid = update_grid(myGrid);
-console.log("Next one:");
-console.log(myGrid);
-  myGrid = update_grid(myGrid);
-console.log("Next one:");
-  console.log(myGrid);
-  myGrid = update_grid(myGrid);
-console.log("Next one:")
-console.log(myGrid);
+function draw_game(grid) {
+  for (let y = 0; y < grid.length; y++) {
+    for (let x = 0; x < grid[y].length; x++) {
+      set_pixel(grid[y][x], x, y);
+    }
+  }
+}
 
+function random_grid(grid_size) {
+  let grid = [];
+  for (let y = 0; y < grid_size; y++) {
+    grid.push([]);
+    for (let x = 0; x < grid_size; x++) {
+      grid[y].push(Math.round(Math.random()));
+    }
+  }
+
+  return grid;
+}
+
+// Sets "pixels" on the canvas
+function set_pixel(value, x, y) {
+  r = (value === 1 ? 0 : 255);
+  g = (value === 1 ? 0 : 255);
+  b = (value === 1 ? 0 : 255);
+  a = 1;
+  context.fillStyle = "rgba("+r+","+g+","+b+","+a+")";
+  context.fillRect( x * pixel_size, y * pixel_size, pixel_size - 1, pixel_size - 1);
+}
 
 function update_grid(a){
 // iterate through the grid
