@@ -1,20 +1,33 @@
-let canvas = document.getElementsByTagName("canvas")[0];
-let context = canvas.getContext("2d");
-let pixel_size = 5;
-let grid_size = 100;
-let canvas_size = grid_size * pixel_size;
-let fps = 10;
+// OUTPUTS (not caps as they aren't settings for the user)
+const canvas = document.getElementById("game");
+const context = canvas.getContext("2d");
 
-canvas.width = canvas_size;
-canvas.height = canvas_size;
+// VISUAL SETTINGS
+const PIXEL_SIZE = 5;
+const GRID_SIZE = 100;
+const GAME_FPS = 10;
 
-console.log("A Game of Life");
-myGrid = random_grid(grid_size);
+// GAMEPLAY SETTINGS
+const GAME_MAX_NEIGHBORS = 3;
+const GAME_MIN_NEIGHBORS = 2;
+const GAME_SPAWN_NEIGHBORS = 3;
 
-setInterval(function() {
+// CALCULATED
+const CANVAS_SIZE = GRID_SIZE * PIXEL_SIZE;
+
+// UPDATE CANVAS SIZE
+canvas.width = CANVAS_SIZE;
+canvas.height = CANVAS_SIZE;
+
+
+myGrid = random_grid(GRID_SIZE);
+
+setInterval(render,1000/GAME_FPS);
+
+function render() {
   draw_game(myGrid);
   myGrid=update_grid(myGrid);
-},1000/fps);
+}
 
 function draw_game(grid) {
   for (let y = 0; y < grid.length; y++) {
@@ -43,12 +56,12 @@ function set_pixel(value, x, y) {
   b = (value ? 0 : 255);
   a = 1;
   context.fillStyle = "rgba("+r+","+g+","+b+","+a+")";
-  context.fillRect( x * pixel_size, y * pixel_size, pixel_size - 1, pixel_size - 1);
+  context.fillRect( x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE - 1, PIXEL_SIZE - 1);
 }
 
 function block_is_alive(grid, x, y) {
-  if (x < 0 || x >= grid_size) return false;
-  if (y < 0 || y >= grid_size) return false;
+  if (x < 0 || x >= GRID_SIZE) return false;
+  if (y < 0 || y >= GRID_SIZE) return false;
 
   return (grid[y][x] || false);
 }
@@ -69,18 +82,20 @@ function live_neighbors(grid, x,y) {
 function update_grid(grid){
   let new_grid = [];
   let liveNeighbours = 0;
-  for (let yc = 0; yc<grid_size; yc++){
+  for (let yc = 0; yc < GRID_SIZE; yc++){
     new_grid[yc] = [];
-    for (let xc = 0; xc<grid_size; xc++){
+    for (let xc = 0; xc < GRID_SIZE; xc++){
       liveNeighbours = live_neighbors(grid, xc, yc);
       
       new_grid[yc][xc] = grid[yc][xc]
-      if ((liveNeighbours < 2) || (liveNeighbours > 3)) {
+      if ((liveNeighbours < GAME_MIN_NEIGHBORS) || (liveNeighbours > GAME_MAX_NEIGHBORS)) {
+        // kill our little friend
         new_grid[yc][xc] = 0;
       }
 
-      if (liveNeighbours == 3){
-         new_grid[yc][xc] = 1;
+      if (liveNeighbours == GAME_SPAWN_NEIGHBORS){
+        // welcome back to life, little pixel!
+        new_grid[yc][xc] = 1;
       }
     }
   }
